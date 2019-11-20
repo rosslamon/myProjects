@@ -1,6 +1,11 @@
 #include <ArduinoHttpClient.h>
 #include <WiFiNINA.h>
 #include <SPI.h>
+#include <DHT.h>;
+#define DHTPIN 7     // what pin we're connected to
+#define DHTTYPE DHT22   // DHT 22  (AM2302)
+DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
+
 
 int status = WL_IDLE_STATUS;
 #include "arduino_secrets.h" 
@@ -12,11 +17,11 @@ int port = 80;
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, serverAddress, port);
 
-
+int chk;
 int inputPin = 2;               // choose the input pin (for PIR sensor)
 int pirState = LOW;             // we start, assuming no motion detected
 int val = 0;                    // variable for reading the pin status
-
+float temp; //Stores temperature value
 
 
 void setup() {
@@ -28,6 +33,7 @@ void setup() {
     while (true);
          // declare LED as output
   pinMode(inputPin, INPUT);
+  dht.begin();
   }
 
   String fv = WiFi.firmwareVersion();
@@ -74,7 +80,16 @@ val = digitalRead(inputPin);  // read input value
     }
   }
 
-
+delay(2000);
+    //Read data and store it to variables hum and temp
+    
+    temp= dht.readTemperature();
+    //Print temp and humidity values to serial monitor
+   
+    Serial.print("  Temp: ");
+    Serial.print(temp);
+    Serial.println(" Celsius");
+    delay(10000); //Delay 2 sec.
 
 
 
